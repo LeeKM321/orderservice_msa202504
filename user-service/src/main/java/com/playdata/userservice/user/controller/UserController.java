@@ -36,6 +36,7 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    // 야호
     // 기존에는 yml 값 가지고 올때 @Value를 사용해서 끌고 옴
     // Environment 객체를 통해 yml에 있는 프로퍼티에 직접 접근이 가능합니다.
     private final Environment env;

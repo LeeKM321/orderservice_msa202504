@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
+    // 메롱
     // 서비스는 repository에 의존하고 있다. -> repository의 기능을 써야 한다.
     // repository 객체를 자동으로 주입받자. (JPA가 만들어서 컨테이너에 등록해 놓음)
     private final UserRepository userRepository;
