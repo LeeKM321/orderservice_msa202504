@@ -110,6 +110,7 @@ pipeline {
 
                             # Docker에게 push 명령을 내리면 지정된 URL로 push할 수 있게 설정.
                             # 자동으로 로그인 도구를 쓰게 설정
+                            mkdir -p ~/.docker
                             echo '{"credHelpers": {"${ECR_URL}": "ecr-login"}}' > ~/.docker/config.json
 
                             docker build -t ${service}:latest ${service}
