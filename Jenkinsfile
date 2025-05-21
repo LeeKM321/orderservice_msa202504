@@ -17,6 +17,17 @@ pipeline {
                 checkout scm // 젠킨스와 연결된 소스 컨트롤 매니저(git 등)에서 코드를 가져오는 명령어
             }
         }
+
+        stage('Add Secret To config-service') {
+            step {
+                withCredentials([file(credentialsId: 'config-secret', variable: 'configSecret')]) {
+                    script {
+                        sh 'cp $configSecret config-service/src/main/resources/application-dev.yml'
+                    }
+                }
+            }
+        }
+
         stage('Detect Changes') {
             steps {
                 script {
@@ -99,7 +110,7 @@ pipeline {
                 script {
                     // jenkins에 저장된 credentials를 사용하여 AWS 자격증명을 설정.
                     withAWS(region: "${REGION}", credentials: "aws-key") {
-                        def changedServices = env.SERVICE_DIRS.split(",")
+                        def changedServices = env.CHANGED_SERVICES.split(",")
                         changedServices.each { service ->
                             sh """
                             # ECR에 이미지를 push하기 위해 인증 정보를 대신 검증해 주는 도구 다운로드.
