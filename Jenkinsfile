@@ -1,6 +1,6 @@
 // 자주 사용되는 필요한 변수를 전역으로 선언하는 것도 가능.
 def ecrLoginHelper = "docker-credential-ecr-login" // ECR credential helper 이름
-
+def deployHost = "172.31.18.125" // 배포 인스턴스의 private 주소
 
 // 젠킨스의 선언형 파이프라인 정의부 시작 (그루비 언어)
 pipeline {
@@ -92,7 +92,9 @@ pipeline {
         }
 
         stage('Build Docker Image & Push to AWS ECR') {
-
+            when {
+                expression { env.CHANGED_SERVICES != "" }
+            }
             steps {
                 script {
                     // jenkins에 저장된 credentials를 사용하여 AWS 자격증명을 설정.
@@ -119,6 +121,32 @@ pipeline {
                     }
 
 
+                }
+            }
+        }
+
+        stage('Deploy Changed Services to AWS EC2') {
+            when {
+                expression { env.CHANGED_SERVICES != "" }
+            }
+            steps {
+                sshagent(credentials: ["deploy-key"]) {
+                    sh """
+                    # Jenkins에서 배포 서버로 docker-compose.yml 복사 후 전송
+                    scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${deployHost}:/home/ubuntu/docker-compose.yml
+
+                    # 배포 서버로 직접 접속 시도 (compose 돌리러 갑니다!)
+                    ssh -o StrictHostKeyChecking=no ubuntu@${deployHost} '
+                    cd /home/ubuntu && \
+
+                    # 시간이 지나 로그인 만료 시 필요한 명령
+                    aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URL} && \
+
+                    # docker compose를 이용해서 변경된 서비스만 이미지를 pull -> 일괄 실행
+                    docker-compose pull ${env.CHANGED_SERVICES} && \
+                    docker compose up -d ${env.CHANGED_SERVICES}
+                    '
+                    """
                 }
             }
         }
