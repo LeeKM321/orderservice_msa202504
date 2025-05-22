@@ -9,6 +9,13 @@ services:
       - msa-network
     ports:
       - "8888:8888"
+    environment:
+      # 환경변수명=${.env에 있는 변수명}
+      - GITHUB_URL=${GITHUB_URL}
+      - USERNAME=${GITHUB_USERNAME}
+      - TOKEN=${GITHUB_TOKEN}
+    env_file:
+      - .env # .env 파일에서 환경변수 로드
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://config-service:8888/actuator/health" ]
       interval: 15s # 15초마다 한번씩 체크
