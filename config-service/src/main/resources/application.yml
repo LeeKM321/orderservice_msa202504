@@ -19,12 +19,3 @@ management:
       exposure:
         include: health, refresh, beans
 
-
-
-
-
-
-
-
-
-1
