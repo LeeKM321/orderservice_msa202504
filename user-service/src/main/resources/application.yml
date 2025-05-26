@@ -10,7 +10,7 @@ spring:
     host: smtp.gmail.com # SMTP 서버 호스트
     port: 587 # SMTP 서버 포트
     username: stephen4951
-    password:  # 앱 비밀번호 16자리 (공백없이)
+    password: vdivgvvfcmkoudgk # 앱 비밀번호 16자리 (공백없이)
     properties:
       mail:
         smtp:
