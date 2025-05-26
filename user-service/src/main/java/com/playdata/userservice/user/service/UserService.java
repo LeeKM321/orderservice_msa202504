@@ -145,7 +145,7 @@ public class UserService {
     public Map<String, String> verifyEmail(Map<String, String> map) {
         // 차단 상태 확인
         if (isBlocked(map.get("email"))) {
-            throw new IllegalArgumentException("blocking");
+            throw new IllegalArgumentException("Blocking");
         }
 
         // 레디스에 저장된 인증 코드 조회
@@ -163,7 +163,7 @@ public class UserService {
             // 최대 시도 횟수 초과시 차단
             if (attemptCount >= 3) {
                 blockUser(map.get("email"));
-                throw new IllegalArgumentException("email blocked!");
+                throw new IllegalArgumentException("blocking");
             }
             int remainingAttempts = 3 - attemptCount;
             throw new IllegalArgumentException(String.format("authCode wrong!, %d", remainingAttempts));

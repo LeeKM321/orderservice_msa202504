@@ -20,7 +20,7 @@ public class MailSenderService {
     // userService가 이 메서드를 호출할 겁니다.
     public String joinMail(String email) throws MessagingException {
         int authNum = makeRandomNumber();
-        String setFrom = "stephen4951@gmail.com"; // 발신용 이메일 주소 (yml과 동일하게!)
+        String setFrom = "stephen4951@naver.com"; // 발신용 이메일 주소 (yml과 동일하게!)
         String toMail = email; // 수신받을 이메일 (가입하고자 하는 사람의 이메일)
         String title = "Order-Service 회원 가입 인증 이메일 입니다.";
         String content = "홈페이지 가입을 신청해 주셔서 감사합니다." +
