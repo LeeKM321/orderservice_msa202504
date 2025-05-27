@@ -1,6 +1,7 @@
 package com.playdata.userservice.user.service;
 
 import com.playdata.userservice.common.auth.TokenUserInfo;
+import com.playdata.userservice.common.dto.KakaoUserDto;
 import com.playdata.userservice.user.dto.UserLoginReqDto;
 import com.playdata.userservice.user.dto.UserResDto;
 import com.playdata.userservice.user.dto.UserSaveReqDto;
@@ -208,7 +209,7 @@ public class UserService {
     }
 
     // 인가 코드로 카카오 액세스 토큰 받기
-    public void getKakaoAccessToken(String code) {
+    public String getKakaoAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
 
         // 요청 URI
@@ -247,8 +248,38 @@ public class UserService {
 
         log.info("응답 JSON 데이터: {}", responseJSON);
 
+        // Access Token 추출 (카카오 로그인 중인 사용자의 정보를 요청할 때 필요한 토큰)
+        String accessToken = (String) responseJSON.get("access_token");
+
+        return accessToken;
+    }
+
+    // Access Token으로 사용자 정보 얻어오기!
+    public KakaoUserDto getKakaoUserInfo(String kakaoAccessToken) {
+        String requestUri = "https://kapi.kakao.com/v2/user/me";
+
+        // 요청 헤더
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type",  "application/x-www-form-urlencoded;charset=utf-8");
+        headers.add("Authorization", "Bearer " + kakaoAccessToken);
+
+        // 요청 보내기
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<KakaoUserDto> response = restTemplate.exchange(
+                requestUri,
+                HttpMethod.POST,
+                new HttpEntity<>(headers),
+                KakaoUserDto.class
+        );
+
+        KakaoUserDto dto = response.getBody();
+        log.info("응답된 사용자 정보: {}", dto);
+
+        return dto;
+
     }
 }
+
 
 
 
