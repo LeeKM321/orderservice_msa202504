@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: user-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin123
 
   mail:
     host: smtp.naver.com # SMTP 서버 호스트
@@ -25,7 +30,7 @@ spring:
 # 카카오 로그인용 데이터
 oauth2:
   kakao:
-    client-id:
+    client-id: b8082dd8d59ae5d54ed4e91767604116
     redirect-uri: http://localhost:8000/user-service/user/kakao
 
 

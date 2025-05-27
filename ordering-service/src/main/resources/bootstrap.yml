@@ -1,5 +1,5 @@
 spring:
   cloud:
     config:
-      uri: http://config-service:8888
-      profile: default
+      uri: http://localhost:8888
+      profile: dev

@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: ordering-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin123
 
 
 #  서킷 브레이커 (Circuit Breaker)

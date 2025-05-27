@@ -2,6 +2,7 @@ package com.playdata.gatewayservice.filter;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
+@RefreshScope
 public class GlobalFilter
         extends AbstractGatewayFilterFactory<GlobalFilter.Config> {
 

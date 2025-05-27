@@ -37,7 +37,7 @@ dependencies {
     // config-service로부터 공통 설정 받기 위해서 추가하는 라이브러리
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 
 
     // spring에서 redis 접속 및 명령을 내릴 수 있게 해 주는 의존성 라이브러리
@@ -65,6 +65,9 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    implementation 'org.springframework.boot:spring-boot-starter-bus-amqp'
+
 
 }
 
