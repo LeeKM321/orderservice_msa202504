@@ -10,12 +10,20 @@ import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.util.List;
@@ -34,6 +42,11 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final MailSenderService mailSenderService;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    @Value("${oauth2.kakao.client-id}")
+    private String kakaoClientId;
+    @Value("${oauth2.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
 
     // Redis key 상수
     private static final String VERIFICATION_CODE_KEY = "email_verify:code:";
@@ -192,6 +205,48 @@ public class UserService {
         redisTemplate.opsForValue().set(key, count, Duration.ofMinutes(1));
 
         return count;
+    }
+
+    // 인가 코드로 카카오 액세스 토큰 받기
+    public void getKakaoAccessToken(String code) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 요청 URI
+        String requestUri = "https://kauth.kakao.com/oauth/token";
+
+        // 헤더정보 세팅
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        // 바디정보 세팅
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", "authorization_code");
+        map.add("code", code);
+        map.add("redirect_uri", kakaoRedirectUri);
+        map.add("client_id", kakaoClientId);
+
+        // 헤더정보와 바디정보를 하나로 합치자
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+        // 요청 보내기 (토큰 발급)
+        /*
+            - RestTemplate객체가 REST API 통신을 위한 API인데 (자바스크립트 fetch역할)
+            - 서버에 통신을 보내면서 응답을 받을 수 있는 메서드가 exchange
+            param1: 요청 URL
+            param2: 요청 방식 (get, post, put, patch, delete...)
+            param3: 요청 헤더와 요청 바디 정보 - HttpEntity로 포장해서 줘야 함
+            param4: 응답결과(JSON)를 어떤 타입으로 받아낼 것인지 (ex: DTO로 받을건지 Map으로 받을건지)
+         */
+        ResponseEntity<Map> responseEntity = restTemplate.exchange(
+                requestUri, HttpMethod.POST, request, Map.class
+        );
+
+        // 응답 데이터에서 JSON 추출
+        Map<String, Object> responseJSON
+                = (Map<String, Object>) responseEntity.getBody();
+
+        log.info("응답 JSON 데이터: {}", responseJSON);
+
     }
 }
 

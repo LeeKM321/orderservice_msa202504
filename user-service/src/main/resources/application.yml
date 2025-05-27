@@ -22,7 +22,11 @@ spring:
 #          starttls:
 #            enable: true 구글(gmail) 설정은 tls 사용 허용
 
-
+# 카카오 로그인용 데이터
+oauth2:
+  kakao:
+    client-id:
+    redirect-uri: http://localhost:8000/user-service/user/kakao
 
 
 
