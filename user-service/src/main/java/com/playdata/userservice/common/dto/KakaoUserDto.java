@@ -18,6 +18,9 @@ public class KakaoUserDto {
 
     private Properties properties;
 
+    @JsonProperty("kakao_account")
+    private KakaoAccount account;
+
     @Setter @Getter @ToString
     public static class Properties {
          /*

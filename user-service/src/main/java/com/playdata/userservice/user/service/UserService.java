@@ -278,6 +278,30 @@ public class UserService {
         return dto;
 
     }
+
+    public UserResDto findOrCreateKakaoUser(KakaoUserDto dto) {
+        // 카카오 ID로 기존 사용자 찾기
+        Optional<User> existingUser
+                = userRepository.findBySocialProviderAndSocialId("KAKAO", dto.getId().toString());
+
+        if (existingUser.isPresent()) { // 기존 사용자
+            User foundUser = existingUser.get();
+            return foundUser.fromEntity();
+        } else { // 처음 카카오 로그인 한 사람 -> 새 사용자 생성
+            User newUser = User.builder()
+                    .email(dto.getAccount().getEmail())
+                    .name(dto.getProperties().getNickname())
+                    .profileImage(dto.getProperties().getProfileImage())
+                    .socialProvider("KAKAO")
+                    .socialId(dto.getId().toString())
+                    .password(null) // 소셜 로그인은 비밀번호 없음
+                    .address(null) // 소셜 플랫폼에서 제공하지 않는 정보는 추후에 따로 페이지 만들어서 전달 받으세요.
+                    .build();
+            User saved = userRepository.save(newUser);
+            return saved.fromEntity();
+        }
+
+    }
 }
 
 
