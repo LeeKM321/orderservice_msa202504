@@ -2,6 +2,7 @@ package com.playdata.orderingservice.ordering.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.playdata.orderingservice.common.auth.TokenUserInfo;
 import com.playdata.orderingservice.ordering.dto.OrderNotificationEvent;
 import com.playdata.orderingservice.ordering.dto.OrderingListResDto;
@@ -25,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,29 +69,43 @@ public class SseController {
 
     // RabbitMQ를 지속적으로 감시해서 새 메세지가 생기면 SSE로 전송하는 역할 수행
     private void startRealtimeListener(SseEmitter emitter, String email) {
+        // 비동기 처리 과정에서 멀티스레드 환경에 맞게 설계된 boolean 타입 전용 클래스
+        AtomicBoolean isConnected = new AtomicBoolean(true);
+
+        // onCompletion: emitter 객체의 지속 시간이 만료되었을 때 실행되는 메서드.
+        // onCompletion이 호출되었다는 건 연결이 끊김을 의미. -> isConnected를 false
+        emitter.onCompletion(() -> {
+            isConnected.set(false);
+            log.info("sse 연결 만료됨!");
+        });
+
         // 별도의 스레드에서 비동기적으로 실행될 것이다. -> 지속적으로 rabbitmq를 감시
         CompletableFuture.runAsync(() -> {
             log.info("실시간 리스너 시작: {}", email);
 
-            try {
-                // 새로운 메세지 대기 (타임아웃: 5초)
-                Message message
-                        = rabbitTemplate.receive("admin.order.notifications", 5000);
+            // emitter가 살아있는 동안은 계속 동작해라.
+            while (isConnected.get()) {
+                try {
+                    // 새로운 메세지 대기 (타임아웃: 5초)
+                    Message message
+                            = rabbitTemplate.receive("admin.order.notifications", 5000);
 
-                if (message != null) {
-                    // 메시지가 도착했다면 (null이 아니라면)
-                    String json = new String(message.getBody(), StandardCharsets.UTF_8);
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    OrderNotificationEvent event
-                            = objectMapper.readValue(json, OrderNotificationEvent.class);
+                    if (message != null) {
+                        // 메시지가 도착했다면 (null이 아니라면)
+                        String json = new String(message.getBody(), StandardCharsets.UTF_8);
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        objectMapper.registerModule(new JavaTimeModule());
+                        OrderNotificationEvent event
+                                = objectMapper.readValue(json, OrderNotificationEvent.class);
 
-                    emitter.send(SseEmitter.event()
-                            .name("new-order")
-                            .data(event));
+                        emitter.send(SseEmitter.event()
+                                .name("new-order")
+                                .data(event));
 
+                    }
+                } catch (Exception e) {
+                    log.error("실시간 리스너 오류: {}", email, e);
                 }
-            } catch (Exception e) {
-                log.error("실시간 리스너 오류: {}", email, e);
             }
 
             log.info("실시간 리스너 종료: {}", email);
@@ -114,29 +130,6 @@ public class SseController {
         }, 30, 30, TimeUnit.SECONDS);
     }
 
-    public void sendOrderMessage(Ordering savedOrdering) {
-        String userEmail = savedOrdering.getUserEmail();
-        Long id = savedOrdering.getId();
-
-        HashMap<Object, Object> map = new HashMap<>();
-        map.put("userEmail", userEmail);
-        map.put("id", id);
-
-        // 관리자 이메일로 emitter 객체 얻어오기
-        SseEmitter emitter = emitters.get("admin@admin.com");
-
-        try {
-            emitter.send(
-                    SseEmitter.event()
-                            .name("ordered")
-                            .data(map)
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
 }
 
 

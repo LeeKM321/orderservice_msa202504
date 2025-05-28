@@ -1,5 +1,6 @@
 package com.playdata.orderingservice.ordering.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.playdata.orderingservice.ordering.entity.Ordering;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class OrderNotificationEvent {
     private Long customerId;  // 고객 ID (추가 조회용)
     private String orderStatus;  // 주문 상태 (ORDERED, CANCELED 등)
     private int totalItems;  // 총 상품 개수 (간단한 요약 정보)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderTime; // 주문 시간 (언제 주문했는지)
     private List<OrderItemInfo> orderItems; // 주문 상품 목록 (상세 정보)
 
