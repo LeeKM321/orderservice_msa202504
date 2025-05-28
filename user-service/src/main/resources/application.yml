@@ -30,9 +30,17 @@ spring:
 # 카카오 로그인용 데이터
 oauth2:
   kakao:
-    client-id: b8082dd8d59ae5d54ed4e91767604116
+    client-id:
     redirect-uri: http://localhost:8000/user-service/user/kakao
 
+management:
+  endpoint:
+    health:
+      show-details: always # health 요청 보냈을 때 건강상태 좀 더 디테일하게 보기
+  endpoints:
+    web:
+      exposure:
+        include: health, busrefresh, beans
 
 
 

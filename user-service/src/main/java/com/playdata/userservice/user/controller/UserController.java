@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/user") // user 관련 요청은 /user로 시작한다고 가정.
 @RequiredArgsConstructor
 @Slf4j
-@RefreshScope
+// @RefreshScope // spring cloud config가 관리하는 파일의 데이터가 변경되면 빈들을 새로고침해 주는 아노테이션
 public class UserController {
 
     // 컨트롤러는 서비스에 의존하고 있다. (요청과 함께 전달받은 데이터를 서비스에게 넘겨야 함!)

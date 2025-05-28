@@ -6,6 +6,7 @@ import com.playdata.orderingservice.client.ProductServiceClient;
 import com.playdata.orderingservice.client.UserServiceClient;
 import com.playdata.orderingservice.common.auth.TokenUserInfo;
 import com.playdata.orderingservice.common.dto.CommonResDto;
+import com.playdata.orderingservice.ordering.controller.SseController;
 import com.playdata.orderingservice.ordering.dto.OrderingListResDto;
 import com.playdata.orderingservice.ordering.dto.OrderingSaveReqDto;
 import com.playdata.orderingservice.ordering.dto.ProductResDto;
@@ -38,6 +39,7 @@ public class OrderingService {
 
     private final OrderingRepository orderingRepository;
     private final RestTemplate restTemplate;
+    private final SseController sseController;
 
     // feign client 구현체 주입 받기
     private final UserServiceClient userServiceClient;
@@ -106,7 +108,12 @@ public class OrderingService {
         processOrderToProductService(dtoList, userDto.getId(), ordering);
 
         // 모든 로직에 장애가 없었다면 주문 확정(status가 ORDERED로 처리)
-        return orderingRepository.save(ordering);
+        Ordering savedOrdering = orderingRepository.save(ordering);
+
+        // 관리자에게 주문이 생성되었다는 알림을 전송
+        sseController.sendOrderMessage(savedOrdering);
+
+        return savedOrdering;
     }
 
     public UserResDto getUserResDto(String email) {

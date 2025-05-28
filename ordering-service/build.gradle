@@ -44,6 +44,8 @@ dependencies {
 
 
 
+
+
 	// Spring Cloud 환경에서 server to server 요청을 처리해 주는 feign client 라이브러리
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
