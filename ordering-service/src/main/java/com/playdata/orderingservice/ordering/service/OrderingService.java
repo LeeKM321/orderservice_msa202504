@@ -39,7 +39,7 @@ public class OrderingService {
 
     private final OrderingRepository orderingRepository;
     private final RestTemplate restTemplate;
-    private final SseController sseController;
+    private final OrderNotificationService orderNotificationService;
 
     // feign client 구현체 주입 받기
     private final UserServiceClient userServiceClient;
@@ -110,8 +110,9 @@ public class OrderingService {
         // 모든 로직에 장애가 없었다면 주문 확정(status가 ORDERED로 처리)
         Ordering savedOrdering = orderingRepository.save(ordering);
 
-        // 관리자에게 주문이 생성되었다는 알림을 전송
-        sseController.sendOrderMessage(savedOrdering);
+        // 주문 완료 알림 발송
+        orderNotificationService.sendNewOrderNotification(savedOrdering);
+        log.info("order notification sent successfully, orderId: {}", savedOrdering.getId());
 
         return savedOrdering;
     }
