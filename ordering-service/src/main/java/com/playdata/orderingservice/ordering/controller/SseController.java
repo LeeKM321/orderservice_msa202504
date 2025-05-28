@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
@@ -51,6 +48,7 @@ public class SseController {
             );
 
             // 큐에 쌓인 모든 메시지를 즉시 전송
+            consumeQueuedMessages(emitter, userInfo.getEmail());
 
             // 실시간 알림을 위한 동적 리스너 등록
             startRealtimeListener(emitter, userInfo.getEmail());
@@ -64,6 +62,10 @@ public class SseController {
         }
 
         return emitter;
+
+    }
+
+    private void consumeQueuedMessages(SseEmitter emitter, String email) {
 
     }
 
@@ -113,11 +115,25 @@ public class SseController {
     }
 
     private void setupHeartbeat(SseEmitter emitter) {
+        ScheduledExecutorService scheduler
+                = Executors.newScheduledThreadPool(1);
+
         // 30초마다 heartbeat 메시지를 전송해서 연결 유지
         // 클라이언트에서 사용하는 EventSourcePolyfill이 45초동안 활동이 없으면 지맘대로 연결 종료.
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+        scheduler.scheduleAtFixedRate(() -> {
             // 일정하게 동작시킬 로직을 작성
             try {
+                // heartbeat 전송 전에 클라이언트 상태 파악.
+                emitter.onCompletion(() -> {
+                    scheduler.shutdown();
+                });
+                emitter.onTimeout(() -> {
+                    scheduler.shutdown();
+                });
+                emitter.onError((throwable) -> {
+                    scheduler.shutdown();
+                });
+
                 emitter.send(
                         SseEmitter.event()
                                 .name("heartbeat")
@@ -126,6 +142,8 @@ public class SseController {
             } catch (IOException e) {
                 e.printStackTrace();
                 log.info("Failed to send heartbeat");
+                emitter.complete();
+                scheduler.shutdown();
             }
         }, 30, 30, TimeUnit.SECONDS);
     }
