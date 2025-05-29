@@ -51,6 +51,14 @@ public class RabbitMQConfig {
                 .build();
     }
 
+    // 대기 알림용 큐 (알림 전송 대상 관리자가 없을 시 메시지 누적)
+    @Bean
+    public Queue pendingNotificationQueue() {
+        return QueueBuilder.durable("admin.pending.notifications")
+                .withArgument("x-message-ttl", 86400000) // 24시간
+                .build();
+    }
+
     /**
      * Exchange와 Queue를 연결하는 규칙
      * "order.created" 패턴의 메시지가 오면 → admin.order.notifications 큐로 보내라!
