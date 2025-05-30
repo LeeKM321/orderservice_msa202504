@@ -16,7 +16,7 @@ spring:
           "[/**]": # 모든 경로에 대한 CORS 설정을 시작하겠다.
             allowed-origins:
               - "http://localhost:5173"
-              - "http://playdata-orderservice8917.s3-website.ap-northeast-2.amazonaws.com"
+              - "https://playdatashop8917.store"
             allowed-methods:
               - GET
               - POST
