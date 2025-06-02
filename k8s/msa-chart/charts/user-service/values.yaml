@@ -1,0 +1,7 @@
+# Helm Chart의 기본 설정값을 정의합니다.
+# templates 폴더 안에 있는 yml들이 이 파일에 작성된 값을 참조하여
+# k8s 리소스들을 동적으로 생성할 수 있습니다.
+
+replicaCount: 2
+image: 872651651829.dkr.ecr.ap-northeast-2.amazonaws.com/user-service:latest
+port: 8081

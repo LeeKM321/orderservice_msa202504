@@ -1,0 +1,6 @@
+apiVersion: v2
+name: msa-chart
+description: chart for deploying all services in the Spring Cloud MSA
+type: application
+version: 1.0.0
+appVersion: 1.0.0

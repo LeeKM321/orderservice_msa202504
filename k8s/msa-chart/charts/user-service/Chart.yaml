@@ -1,0 +1,9 @@
+# Helm Chart를 정의하는 메타데이터를 포함하고 있습니다.
+# 주의할 점: apiVersion -> 꼭 v2로 지정 -> Helm 3 이상부터 사용하는 API 버전
+
+apiVersion: v2
+name: user-service
+description: chart for deploying User-Service in the Spring Cloud MSA
+type: application
+version: 1.0.0
+appVersion: 1.0.0
