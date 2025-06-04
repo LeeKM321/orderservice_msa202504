@@ -4,5 +4,5 @@
 spring:
   cloud:
     config:
-      uri: http://config-service:8888
+      uri: http://config-service.default.svc.cluster.local:8888
       profile: default # 공통 application.yml 읽어오겠다.

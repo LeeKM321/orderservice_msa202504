@@ -1,5 +1,5 @@
 spring:
   cloud:
     config:
-      uri: http://config-service:8888
+      uri: http://config-service.default.svc.cluster.local:8888
       profile: default

@@ -1,4 +1,7 @@
 # Helm 차트에서 사용할 전역 값들을 정의하는 곳.
 # 나중에 생성할 템플릿 파일에 적용할 공통 값을 세팅하는 곳.
 
-
+# 클러스터 내에서 docker image를 ecr에서 pull할 때 사용할 계정 정보
+# Secret 오브젝트로 생성했고, 그 오브젝트의 이름이 ecr-secret
+imagePullSecrets:
+  - name: ecr-secret
