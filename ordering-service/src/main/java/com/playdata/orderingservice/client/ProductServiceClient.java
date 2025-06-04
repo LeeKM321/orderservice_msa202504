@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "product-service")
+@FeignClient(name = "product-service", url = "http://product-service.default.svc.cluster.local:8082")
 public interface ProductServiceClient {
 
     @GetMapping("/product/{prodId}")

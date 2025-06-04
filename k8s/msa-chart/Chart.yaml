@@ -4,3 +4,25 @@ description: chart for deploying all services in the Spring Cloud MSA
 type: application
 version: 1.0.0
 appVersion: 1.0.0
+
+# 바깥쪽 차트가 의존하고 있는 내부 차트의 경로를 지정.
+# 바깥쪽 차트(msa-chart)를 install 하면 의존 관계가 있는 모든 내부 차트들이 한꺼번에 install이 진행됨.
+dependencies:
+  - name: rabbitmq
+    version: 1.0.0
+    repository: file://charts/rabbitmq
+  - name: config-service
+    version: 1.0.0
+    repository: file://charts/config-service
+  - name: user-service
+    version: 1.0.0
+    repository: file://charts/user-service
+  - name: ordering-service
+    version: 1.0.0
+    repository: file://charts/ordering-service
+  - name: product-service
+    version: 1.0.0
+    repository: file://charts/product-service
+  - name: gateway-service
+    version: 1.0.0
+    repository: file://charts/gateway-service

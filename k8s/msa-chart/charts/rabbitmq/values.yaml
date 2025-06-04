@@ -1,0 +1,13 @@
+# Helm Chart의 기본 설정값을 정의합니다.
+# templates 폴더 안에 있는 yml들이 이 파일에 작성된 값을 참조하여
+# k8s 리소스들을 동적으로 생성할 수 있습니다.
+
+replicaCount: 1
+image: rabbitmq:3-management
+imagePullPolicy: IfNotPresent
+service:
+  messagingPort: 5672
+  uiPort: 15672
+env:
+  RABBITMQ_DEFAULT_USER: admin
+  RABBITMQ_DEFAULT_PASS: admin123

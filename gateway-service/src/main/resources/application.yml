@@ -38,7 +38,10 @@ spring:
             postLogger: true
       routes:
         - id: user-service
-          uri: lb://USER-SERVICE
+#          uri: lb://USER-SERVICE
+          # k8s 클러스터 내에서 다른 서비스를 지목하기위한 DNS 명명 규칙.
+          # <service-name>.<namespace>.svc.cluster.local:port
+          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
             - Path=/user-service/user/doLogin
             - Method=POST
@@ -47,7 +50,7 @@ spring:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
         - id: user-service
-          uri: lb://USER-SERVICE
+          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
             - Path=/user-service/**
           filters:
@@ -59,7 +62,7 @@ spring:
             - AuthorizationHeaderFilter
 
         - id: product-service
-          uri: lb://PRODUCT-SERVICE
+          uri: http://product-service.default.svc.cluster.local:8082
           predicates:
             - Path=/product-service/**
           filters:
@@ -68,7 +71,7 @@ spring:
             - AuthorizationHeaderFilter
 
         - id: ordering-service
-          uri: lb://ORDERING-SERVICE
+          uri: http://ordering-service.default.svc.cluster.local:8083
           predicates:
             - Path=/ordering-service/**
           filters:
@@ -76,24 +79,8 @@ spring:
             - RewritePath=/ordering-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
 
-        - id: first-service
-          uri: lb://FIRST-SERVICE
-          predicates:
-            - Path=/first-service/**
-          filters:
-            - CustomFilter
 
-        - id: second-service
-          uri: lb://SECOND-SERVICE
-          predicates:
-            - Path=/second-service/**
-          filters:
-            - name: CustomFilter
-            - name: LoggerFilter
-              args:
-                baseMessage: hello gateway!
-                preLogger: false
-                postLogger: true
+
 
 
 
