@@ -2,6 +2,7 @@ package com.playdata.userservice.user.dto;
 
 import com.playdata.userservice.common.entity.Address;
 import com.playdata.userservice.user.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -17,15 +18,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "사용자 회원가입 요청 시 전달되는 데이터")
 public class UserSaveReqDto {
 
+    @Schema(description = "사용자 이름", example = "홍길동", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @NotEmpty(message = "이메일은 필수입니다!")
+    @Schema(description = "이메일 주소", example = "hong@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
     @NotEmpty(message = "비밀번호는 필수입니다!")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
+    @Schema(description = "비밀번호(서버 내부에서 암호화 됩니다.)", example = "password123!", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
     private Address address;

@@ -30,7 +30,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory {
     private final List<String> allowUrl = Arrays.asList(
             "/user/create", "/user/doLogin", "/user/refresh",
             "/product/list", "/user/health-check", "/user/email-valid",
-            "/user/verify", "/user/kakao"
+            "/user/verify", "/user/kakao", "/swagger-ui.html"
     );
 
     @Override
@@ -43,6 +43,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory {
             boolean isAllowed
                     = allowUrl.stream()
                     .anyMatch(url -> antPathMatcher.match(url, path));
+            log.info("request url: {}", path);
             log.info("isAllowed:{}", isAllowed);
 
             if (isAllowed || path.startsWith("/actuator")) {

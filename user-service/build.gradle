@@ -58,7 +58,10 @@ dependencies {
 	// 자바 언어를 통해 smtp 통신을 할 수 있게 하는 라이브러리
 	implementation 'jakarta.mail:jakarta.mail-api:2.1.2'
 
-	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+
+	// Swagger/OpenAPI 추가
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
 
 }

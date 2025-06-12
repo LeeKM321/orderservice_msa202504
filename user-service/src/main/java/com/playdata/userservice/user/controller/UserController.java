@@ -9,6 +9,14 @@ import com.playdata.userservice.user.dto.UserResDto;
 import com.playdata.userservice.user.dto.UserSaveReqDto;
 import com.playdata.userservice.user.entity.User;
 import com.playdata.userservice.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 // @RefreshScope // spring cloud config가 관리하는 파일의 데이터가 변경되면 빈들을 새로고침해 주는 아노테이션
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     // 컨트롤러는 서비스에 의존하고 있다. (요청과 함께 전달받은 데이터를 서비스에게 넘겨야 함!)
     // 빈 등록된 서비스 객체를 자동으로 주입 받자!
@@ -59,7 +67,9 @@ public class UserController {
      }
      */
     @PostMapping("/create")
-    public ResponseEntity<?> userCreate(@Valid @RequestBody UserSaveReqDto dto) {
+    public ResponseEntity<?> userCreate(
+            @Parameter(description = "회원가입 정보", required = true)
+            @Valid @RequestBody UserSaveReqDto dto) {
         // 화면단에서 전달된 데이터를 DB에 넣자.
         // 혹시 이메일이 중복되었는가? -> 이미 이전에 회원가입을 한 회원이라면 거절.
         // dto를 DB에 바로 때려? -> dto를 entity로 바꾸는 로직 추가.
@@ -195,6 +205,8 @@ public class UserController {
         return ResponseEntity.ok().body("Success");
     }
 
+    // Swagger 문서에서 제외할 메서드들에 붙여주시면 됩니다.
+    @Operation(hidden = true)
     @GetMapping("/health-check")
     public String healthCheck() {
         String msg = "It's Working in User-service!\n";
@@ -208,6 +220,7 @@ public class UserController {
     }
 
     // 카카오 콜백 요청 처리
+    @Operation(hidden = true)
     @GetMapping("/kakao")
     public void kakaoCallback(@RequestParam String code,
                               // 응답을 평소처럼 주는게 아니라, 직접 커스텀해서 클라이언트에게 전달.
